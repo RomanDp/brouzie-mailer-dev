@@ -1,0 +1,25 @@
+
+brouzie_mailer:
+    sender:
+        info@site.com: Site Notifications
+    transports:
+        swiftmailer_delayed_spool: @swiftmailer.ololo.trololo
+        swiftmailer_memory_spool: @swiftmailer.ololo.trololo
+    default_transport: swiftmailer_memory_spool
+    emails:
+        user_registration:
+            subject: Hello {{ user.name }}!
+            body: Hello {{ user.name }}!
+            body_html: Hello <b>{{ user.name }}</b>!
+            headers:
+                X-Ololo: trololo
+        user_friendship_request:
+            template: @App/emails/user_friendship_request.html.twig
+            context:
+                ololo: %trololo%
+            required_context_keys: [user, friend]
+        daily_newsletter:
+            template: @App/emails/daily_newsletter.html.twig
+            transport: swiftmailer_delayed_spool
+            sender:
+                newsletter@site.com: 'Daily Newsletter Robot'

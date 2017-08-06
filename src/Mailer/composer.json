@@ -1,0 +1,39 @@
+{
+    "name": "brouzie/mailer",
+    "type": "library",
+    "description": "Mailer library with high level api",
+    "keywords": ["mailer"],
+    "homepage": "https://github.com/Koc/BrouzieMailer",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Konstantin Myakshin",
+            "email": "koc-dp@yandex.ru"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "twig/twig": "^1.34|^2.4",
+        "swiftmailer/swiftmailer": "^5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Brouzie\\Mailer\\": ""
+        },
+        "exclude-from-classmap": [ "/Tests/" ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "bin-dir": "bin",
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
+}
