@@ -1,25 +1,25 @@
 <?php
 
-namespace Brouzie\MailerBundle\src\Mailer\Renderer;
+namespace Brouzie\Mailer\Renderer;
 
 use Brouzie\Mailer\Exception\RendererNotFoundException;
 use Brouzie\Mailer\Model\Email;
-use Brouzie\Mailer\Renderer\Renderer;
 
 class ChainRenderer implements Renderer
 {
     private $renderers;
 
     /**
-     * @param Renderer[] $renderers
+     * @param iterable|Renderer[] $renderers
      */
-    public function __construct(array $renderers)
+    public function __construct(iterable $renderers)
     {
         $this->renderers = $renderers;
     }
 
     public function render(Email $email, array $context = []): void
     {
+        //TODO: who calls supports - this class or other?
         foreach ($this->renderers as $renderer) {
             if ($renderer->supports($email)) {
                 $renderer->render($email, $context);

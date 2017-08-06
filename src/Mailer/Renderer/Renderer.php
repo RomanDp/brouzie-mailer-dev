@@ -2,6 +2,7 @@
 
 namespace Brouzie\Mailer\Renderer;
 
+use Brouzie\Mailer\Exception\RendererNotFoundException;
 use Brouzie\Mailer\Model\Email;
 
 interface Renderer
@@ -10,7 +11,7 @@ interface Renderer
      * @param Email $email
      * @param array $context
      *
-     * @throws \InvalidArgumentException
+     * @throws RendererNotFoundException
      */
     public function render(Email $email, array $context = []): void;
 

@@ -6,18 +6,18 @@ use Brouzie\Mailer\Model\Email;
 
 class TwigContentEmail extends Email
 {
-    private $templates;
+    private $templatesContent;
 
     /**
-     * @param string[] $templates
+     * @param string[] $templatesContent
      */
-    public function __construct(array $templates)
+    public function __construct(array $templatesContent)
     {
-        $this->templates = $templates;
+        $this->templatesContent = $templatesContent;
     }
 
-    public function getTemplate($block)
+    public function getTemplateContent($block)
     {
-        return isset($this->templates[$block]) ? $this->templates[$block] : null;
+        return isset($this->templatesContent[$block]) ? $this->templatesContent[$block] : null;
     }
 }

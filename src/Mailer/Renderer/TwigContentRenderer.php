@@ -21,15 +21,15 @@ class TwigContentRenderer implements Renderer
         /** @var TwigContentEmail $email */
         $context['email'] = $this;
 
-        if ($template = $email->getTemplate(TwigEmail::BLOCK_SUBJECT)) {
+        if ($template = $email->getTemplateContent(TwigEmail::BLOCK_SUBJECT)) {
             $email->setSubject($this->twig->createTemplate($template)->render($context));
         }
 
-        if ($template = $email->getTemplate(TwigEmail::BLOCK_BODY)) {
+        if ($template = $email->getTemplateContent(TwigEmail::BLOCK_BODY)) {
             $email->setContent($this->twig->createTemplate($template)->render($context));
         }
 
-        if ($template = $email->getTemplate(TwigEmail::BLOCK_PLAIN_BODY)) {
+        if ($template = $email->getTemplateContent(TwigEmail::BLOCK_PLAIN_BODY)) {
             $email->setPlainTextContent($this->twig->createTemplate($template)->render($context));
         }
     }
