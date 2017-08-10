@@ -16,10 +16,12 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->append($this->getSenderNode())
+                ->append($this->getContextNode())
+                ->append($this->getHeadersNode())
             ->end()
         ;
 
-//        $this->addEmailsSection($rootNode);
+        $this->addEmailsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -38,7 +40,7 @@ class Configuration implements ConfigurationInterface
             ->beforeNormalization()
             ->ifArray()
                 ->then(function($value) {
-                    if (!isset($value['address']) && reset($value)) {
+                    if (!array_key_exists('address', $value)) {
                         return ['address' => key($value), 'name' => reset($value)];
                     }
 
@@ -48,6 +50,39 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('name')->end()
                 ->scalarNode('address')->isRequired()->cannotBeEmpty()->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getHeadersNode()
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('headers');
+
+        $node
+            ->fixXmlConfig('header')
+            ->normalizeKeys(false)
+            ->useAttributeAsKey('name')
+            ->example(['X-Custom-Header' => 'Custom Value'])
+            ->prototype('scalar')->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getContextNode()
+    {
+        //FIXME: test services
+        $builder = new TreeBuilder();
+        $node = $builder->root('context');
+
+        $node
+            ->fixXmlConfig('context', 'context')
+            ->normalizeKeys(false)
+            ->useAttributeAsKey('key')
+            ->example(array('foo' => '"@bar"', 'pi' => 3.14))
+            ->prototype('scalar')->end()
             ->end();
 
         return $node;
@@ -66,12 +101,14 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('body')->end()
                             ->scalarNode('body_html')->end()
                             ->scalarNode('template')->end()
-                            ->fixXmlConfig('required_context_key')
                             ->arrayNode('required_context_keys')
+                            ->fixXmlConfig('required_context_key')
                                 ->defaultValue([])
                                 ->prototype('scalar')->end()
                             ->end()
                             ->append($this->getSenderNode())
+                            ->append($this->getContextNode())
+                            ->append($this->getHeadersNode())
                         ->end()
                     ->end()
                 ->end()

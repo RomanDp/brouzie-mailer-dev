@@ -16,7 +16,10 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), [$userConfig]);
 
-        $this->assertEquals($normalizedConfig, $config);
+        $this->assertEquals(
+            array_merge($normalizedConfig, ['headers' => [], 'emails' => [], 'context' => []]),
+            $config
+        );
     }
 
     /**
