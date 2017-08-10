@@ -7,6 +7,7 @@ use Brouzie\Mailer\Model\Email;
 
 interface Renderer
 {
+    //FIXME: use different exception?
     /**
      * @param Email $email
      * @param array $context

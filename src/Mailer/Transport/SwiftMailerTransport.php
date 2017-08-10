@@ -39,5 +39,8 @@ class SwiftMailerTransport implements Transport
         }
 
         //FIXME: headers, attachments
+
+        //TODO: handle failed recipients
+        $this->mailer->send($message);
     }
 }
