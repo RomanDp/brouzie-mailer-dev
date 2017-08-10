@@ -6,6 +6,10 @@ brouzie_mailer:
         swiftmailer_delayed_spool: @swiftmailer.ololo.trololo
         swiftmailer_memory_spool: @swiftmailer.ololo.trololo
     default_transport: swiftmailer_memory_spool
+    context:
+        a: b
+    headers:
+        X-Abc: abcd
     emails:
         user_registration:
             subject: Hello {{ user.name }}!
