@@ -48,8 +48,8 @@ class Configuration implements ConfigurationInterface
                 })
             ->end()
             ->children()
-                ->scalarNode('name')->end()
                 ->scalarNode('address')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('name')->end()
             ->end();
 
         return $node;

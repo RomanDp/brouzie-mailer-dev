@@ -25,6 +25,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider invalidSenderProvider
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp /sender/
      */
     public function testSenderNodeRequired(array $userConfig)
     {

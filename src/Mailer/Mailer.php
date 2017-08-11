@@ -28,17 +28,25 @@ class Mailer
      */
     private $predefinedEmails;
 
+    private $defaultContext;
+
+    private $defaultHeaders;
+
     /**
      * @param Renderer $renderer
      * @param array|Transport[]|ContainerInterface $transports
      * @param string $defaultTransport
      * @param array|PredefinedEmail[]|ContainerInterface $predefinedEmails
+     * @param array $defaultContext
+     * @param array $defaultHeaders
      */
     public function __construct(
         Renderer $renderer,
         $transports,
         string $defaultTransport = 'default',
-        array $predefinedEmails = []
+        $predefinedEmails = [],
+        array $defaultContext = [],
+        array $defaultHeaders = []
     ) {
         $this->renderer = $renderer;
 
@@ -66,11 +74,16 @@ class Mailer
                 'Expected an array of predefined emails or "Psr\Container\ContainerInterface" instance.'
             );
         }
+
+        $this->defaultContext = $defaultContext;
+        $this->defaultHeaders = $defaultHeaders;
     }
 
     public function sendEmail(Email $email, array $context = [], $transport = null)
     {
         //TODO: add events?
+        $context = array_replace($this->defaultContext, $context);
+        $email->addHeaders($this->defaultHeaders);
         $this->renderer->render($email, $context);
 
         $this->getTransport($transport)->send($email);
@@ -83,15 +96,17 @@ class Mailer
             throw PredefinedEmailNotFoundException::create($name, array_keys($this->predefinedEmails));
         }
 
+        /** @var PredefinedEmail $predefinedEmail */
         $predefinedEmail = $this->predefinedEmails->get($name);
         $context = array_replace($predefinedEmail->getDefaultContext(), $context);
         $predefinedEmail->validateContext($context);
 
+        $email = $predefinedEmail->getEmail();
         if (null !== $configurator) {
-            $configurator($predefinedEmail->getEmail(), $context);
+            $configurator($email, $context);
         }
 
-        $this->sendEmail($predefinedEmail->getEmail(), $context, $predefinedEmail->getTransport());
+        $this->sendEmail($email, $context, $predefinedEmail->getTransport());
     }
 
     private function getTransport($transport): Transport

@@ -92,14 +92,18 @@ class Email
         $this->attachments[] = $attachment;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
-        //FIXME: properly implement
         return $this->headers;
     }
 
-    public function setHeaders($headers)
+    public function setHeaders(array $headers)
     {
         $this->headers = $headers;
+    }
+
+    public function addHeaders(array $headers)
+    {
+        $this->headers = array_replace($headers, $this->headers);
     }
 }
