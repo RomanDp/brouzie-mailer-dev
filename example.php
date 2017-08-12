@@ -7,6 +7,7 @@ use Brouzie\Mailer\Renderer\TwigRenderer;
 use Brouzie\Mailer\SwiftMailerTransport;
 
 // https://github.com/Sylius/SyliusMailerBundle
+// http://docs.sylius.org/en/latest/bundles/SyliusMailerBundle/configuration.html
 // https://github.com/Sylius/Mailer/
 // https://github.com/Sylius/Sylius/issues/6749
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="brouzie.mailer" class="Brouzie\Mailer\Mailer">
+            <argument /> <!-- renderer, added by compiler? pass -->
+            <argument type="service" id="brouzie.mailer.transport_locator" />
+            <argument /> <!-- default transport, added extension -->
+            <argument /> <!-- default sender, added extension -->
+            <argument /> <!-- predefined emails, added by extension -->
+            <argument /> <!-- default context, added by extension -->
+            <argument /> <!-- default headers, added by extension -->
+        </service>
+
+        <service id="brouzie.mailer.transport_locator" class="Brouzie\Mailer\Container\SimpleServiceLocator">
+            <argument type="collection" /> <!-- transports, added by extension -->
+            <tag name="container.service_locator" />
+        </service>
+
+        <service id="brouzie.mailer.transport.swiftmailer.absrtact" class="Brouzie\Mailer\SwiftMailerTransport" public="false" abstract="true">
+            <argument /> <!-- swiftmailer instance, added by extension -->
+        </service>
+    </services>
+</container>

@@ -7,13 +7,25 @@ use Brouzie\Mailer\Model\Email;
 
 class TwigEmail extends Email
 {
+    /**
+     * @internal
+     */
     const BLOCK_SUBJECT = 'subject';
 
+    /**
+     * @internal
+     */
     const BLOCK_BODY = 'body';
 
+    /**
+     * @internal
+     */
     const BLOCK_PLAIN_BODY = 'plain_body';
 
-    //FIXME: headers?
+    /**
+     * @internal
+     */
+    const BLOCK_HEADERS = 'headers';
 
     private $template;
 

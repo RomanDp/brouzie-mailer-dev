@@ -63,7 +63,7 @@ class Email
 
     public function getSender(): ?Address
     {
-        $this->sender;
+        return $this->sender;
     }
 
     public function addRecipient(Address $recipient)
@@ -105,5 +105,10 @@ class Email
     public function addHeaders(array $headers)
     {
         $this->headers = array_replace($headers, $this->headers);
+    }
+
+    public function replaceHeaders(array $headers)
+    {
+        $this->headers = array_replace($this->headers, $headers);
     }
 }

@@ -19,7 +19,7 @@ class TwigRenderer implements Renderer
     {
         /** @var TwigEmail $email */
         $template = $this->twig->load($email->getTemplate());
-        $context['email'] = $this;
+        $context['_email'] = $this;
 
         if ($template->hasBlock(TwigEmail::BLOCK_SUBJECT)) {
             $email->setSubject($template->renderBlock(TwigEmail::BLOCK_SUBJECT, $context));
@@ -31,6 +31,12 @@ class TwigRenderer implements Renderer
 
         if ($template->hasBlock(TwigEmail::BLOCK_PLAIN_BODY)) {
             $email->setPlainTextContent($template->renderBlock(TwigEmail::BLOCK_PLAIN_BODY, $context));
+        }
+
+        if ($template->hasBlock(TwigEmail::BLOCK_HEADERS)) {
+            $headers = $template->renderBlock(TwigEmail::BLOCK_HEADERS, $context);
+            $headers = http_parse_headers($headers);
+            $email->replaceHeaders($headers);
         }
     }
 

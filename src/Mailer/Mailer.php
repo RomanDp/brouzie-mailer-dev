@@ -6,11 +6,13 @@ use Brouzie\Mailer\Container\SimpleServiceLocator;
 use Brouzie\Mailer\Exception\InvalidArgumentException;
 use Brouzie\Mailer\Exception\PredefinedEmailNotFoundException;
 use Brouzie\Mailer\Exception\TransportNotFoundException;
+use Brouzie\Mailer\Model\Address;
 use Brouzie\Mailer\Model\Email;
 use Brouzie\Mailer\Model\PredefinedEmail;
 use Brouzie\Mailer\Renderer\Renderer;
 use Brouzie\Mailer\Transport\Transport;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class Mailer
 {
@@ -22,6 +24,8 @@ class Mailer
     private $transports;
 
     private $defaultTransport;
+
+    private $defaultSender;
 
     /**
      * @var ContainerInterface
@@ -36,6 +40,7 @@ class Mailer
      * @param Renderer $renderer
      * @param array|Transport[]|ContainerInterface $transports
      * @param string $defaultTransport
+     * @param Address $defaultSender
      * @param array|PredefinedEmail[]|ContainerInterface $predefinedEmails
      * @param array $defaultContext
      * @param array $defaultHeaders
@@ -44,6 +49,7 @@ class Mailer
         Renderer $renderer,
         $transports,
         string $defaultTransport = 'default',
+        Address $defaultSender,
         $predefinedEmails = [],
         array $defaultContext = [],
         array $defaultHeaders = []
@@ -64,6 +70,8 @@ class Mailer
         if ($this->transports->has($defaultTransport)) {
             throw new TransportNotFoundException(sprintf('Missing default transport "%s".', $defaultTransport));
         }
+
+        $this->defaultSender = $defaultSender;
 
         if ($predefinedEmails instanceof ContainerInterface) {
             $this->predefinedEmails = $predefinedEmails;
@@ -86,19 +94,24 @@ class Mailer
         $email->addHeaders($this->defaultHeaders);
         $this->renderer->render($email, $context);
 
+        if (null === $email->getSender()) {
+            $email->setSender($this->defaultSender);
+        }
+
         $this->getTransport($transport)->send($email);
     }
 
     public function sendNamedEmail($name, array $context = [], callable $configurator = null)
     {
-        if ($this->predefinedEmails->has($name)) {
+        /** @var PredefinedEmail $predefinedEmail */
+        try {
+            $predefinedEmail = $this->predefinedEmails->get($name);
+        } catch (NotFoundExceptionInterface $e) {
             //FIXME: how to get all available services?
             throw PredefinedEmailNotFoundException::create($name, array_keys($this->predefinedEmails));
         }
 
-        /** @var PredefinedEmail $predefinedEmail */
-        $predefinedEmail = $this->predefinedEmails->get($name);
-        $context = array_replace($predefinedEmail->getDefaultContext(), $context);
+        $context = array_replace($predefinedEmail->getDefaultContext(), $context, ['_email_name' => $name]);
         $predefinedEmail->validateContext($context);
 
         $email = $predefinedEmail->getEmail();
@@ -113,11 +126,11 @@ class Mailer
     {
         $transport = $transport ?: $this->defaultTransport;
 
-        if ($this->transports->has($transport)) {
+        try {
+            return $this->transports->get($transport);
+        } catch (NotFoundExceptionInterface $e) {
             //FIXME: how to get all available services?
             throw TransportNotFoundException::create($transport, array_keys($this->transports));
         }
-
-        return $this->transports->get($transport);
     }
 }
