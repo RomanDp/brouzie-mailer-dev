@@ -6,22 +6,60 @@
 
     <services>
         <service id="brouzie.mailer" class="Brouzie\Mailer\Mailer">
-            <argument /> <!-- renderer, added by compiler? pass -->
+            <argument type="service" id="brouzie.mailer.renderer" />
             <argument type="service" id="brouzie.mailer.transport_locator" />
-            <argument /> <!-- default transport, added extension -->
-            <argument /> <!-- default sender, added extension -->
-            <argument /> <!-- predefined emails, added by extension -->
-            <argument /> <!-- default context, added by extension -->
-            <argument /> <!-- default headers, added by extension -->
+            <argument>%brouzie.mailer.default_transport%</argument>
+            <argument type="service" id="brouzie.mailer.default_sender" />
+            <argument type="service" id="brouzie.mailer.predefined_email_locator" />
+            <argument>%brouzie.mailer.default_context%</argument>
+            <argument>%brouzie.mailer.default_headers%</argument>
         </service>
 
-        <service id="brouzie.mailer.transport_locator" class="Brouzie\Mailer\Container\SimpleServiceLocator">
+        <service id="brouzie.mailer.transport_locator" class="Brouzie\Mailer\Container\SimpleServiceLocator" public="false">
             <argument type="collection" /> <!-- transports, added by extension -->
             <tag name="container.service_locator" />
         </service>
 
-        <service id="brouzie.mailer.transport.swiftmailer.absrtact" class="Brouzie\Mailer\SwiftMailerTransport" public="false" abstract="true">
+        <service id="brouzie.mailer.default_sender" class="Brouzie\Mailer\Model\Address" public="false">
+            <argument>%brouzie.mailer.default_sender%</argument>
+        </service>
+
+        <service id="brouzie.mailer.predefined_email_locator" class="Brouzie\Mailer\Container\SimpleServiceLocator" public="false">
+            <argument type="collection" /> <!-- predefined emails, added by extension -->
+            <tag name="container.service_locator" />
+        </service>
+
+        <service id="brouzie.mailer.transport.swiftmailer.abstract" class="Brouzie\Mailer\Transport\SwiftMailerTransport" public="false" abstract="true">
             <argument /> <!-- swiftmailer instance, added by extension -->
+        </service>
+
+        <service id="brouzie.mailer.emails.predefined_email.abstract" class="Brouzie\Mailer\Model\PredefinedEmail" public="false" abstract="true">
+            <argument /> <!-- email, added by extension -->
+            <argument /> <!-- default context, added by extension -->
+            <argument /> <!-- required context keys, added by extension -->
+            <argument /> <!-- transport, added by extension -->
+        </service>
+
+        <service id="brouzie.mailer.emails.twig_email.abstract" class="Brouzie\Mailer\Model\Twig\TwigEmail" public="false" abstract="true">
+            <argument /> <!-- template, added by extension -->
+        </service>
+
+        <service id="brouzie.mailer.emails.twig_content_email.abstract" class="Brouzie\Mailer\Model\Twig\TwigContentEmail" public="false" abstract="true">
+            <argument type="collection" /> <!-- blocks, added by extension -->
+        </service>
+
+        <service id="brouzie.mailer.renderers.chain" class="Brouzie\Mailer\Renderer\ChainRenderer" public="false">
+            <argument type="collection" />
+        </service>
+
+        <service id="brouzie.mailer.renderers.twig_renderer" class="Brouzie\Mailer\Renderer\TwigRenderer" public="false">
+            <argument type="service" id="twig" />
+            <tag name="brouzie_mailer.email_renderer" priority="100" />
+        </service>
+
+        <service id="brouzie.mailer.renderers.twig_content_renderer" class="Brouzie\Mailer\Renderer\TwigContentRenderer" public="false">
+            <argument type="service" id="twig" />
+            <tag name="brouzie_mailer.email_renderer" priority="50" />
         </service>
     </services>
 </container>

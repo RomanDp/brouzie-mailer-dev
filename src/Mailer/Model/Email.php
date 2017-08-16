@@ -72,6 +72,16 @@ class Email
     }
 
     /**
+     * @param iterable|Address[] $recipients
+     */
+    public function addRecipients(iterable $recipients)
+    {
+        foreach ($recipients as $recipient) {
+            $this->addRecipient($recipient);
+        }
+    }
+
+    /**
      * @return Address[]
      */
     public function getRecipients(): array

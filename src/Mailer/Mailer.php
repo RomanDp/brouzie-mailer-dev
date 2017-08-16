@@ -67,7 +67,7 @@ class Mailer
         }
 
         $this->defaultTransport = $defaultTransport;
-        if ($this->transports->has($defaultTransport)) {
+        if (!$this->transports->has($defaultTransport)) {
             throw new TransportNotFoundException(sprintf('Missing default transport "%s".', $defaultTransport));
         }
 
@@ -101,8 +101,31 @@ class Mailer
         $this->getTransport($transport)->send($email);
     }
 
-    public function sendNamedEmail($name, array $context = [], callable $configurator = null)
+    /**
+     * @param $name
+     * @param string|array|Address|Address[] $recipients
+     * @param array $context
+     * @param callable|null $configurator
+     */
+    public function sendNamedEmail(string $name, $recipients, array $context = [], callable $configurator = null)
     {
+        $targetRecipients = [];
+        if (is_string($recipients)) {
+            $targetRecipients[] = new Address($recipients);
+        } elseif ($recipients instanceof Address) {
+            $targetRecipients[] = $recipients;
+        } elseif (is_iterable($recipients)) {
+            foreach ($recipients as $key => $recipient) {
+                if (is_int($key)) {
+                    $targetRecipients[] = new Address($recipient);
+                } else {
+                    $targetRecipients[] = new Address($key, $recipient);
+                }
+            }
+        } else {
+            throw new InvalidArgumentException('Expected string/array/array of Address.');
+        }
+
         /** @var PredefinedEmail $predefinedEmail */
         try {
             $predefinedEmail = $this->predefinedEmails->get($name);
@@ -115,6 +138,7 @@ class Mailer
         $predefinedEmail->validateContext($context);
 
         $email = $predefinedEmail->getEmail();
+        $email->addRecipients($targetRecipients);
         if (null !== $configurator) {
             $configurator($email, $context);
         }

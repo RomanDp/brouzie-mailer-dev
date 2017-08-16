@@ -14,42 +14,34 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->beforeNormalization()
-                ->ifTrue(function ($v) { return is_array($v) && !array_key_exists('transports', $v) && !array_key_exists('transport', $v); })
+                ->ifTrue(function ($v) { return is_array($v) && (array_key_exists('transports', $v) || array_key_exists('transport', $v)); })
                 ->then(function ($v) {
-                    $transport = array();
-                    foreach ($v as $key => $value) {
-                        if ('default_transport' === $key) {
-                            continue;
-                        }
-                        $transport[$key] = $v[$key];
-                        unset($v[$key]);
+                    if (!isset($v['default_transport']) && !empty($v['transports'])) {
+                        reset($v['transports']);
+                        $v['default_transport'] = key($v['transports']);
                     }
-                    $v['default_transport'] = isset($v['default_transport']) ? (string) $v['default_transport'] : 'default';
-                    $v['transports'] = array($v['default_transport'] => $transport);
 
                     return $v;
                 })
             ->end()
             ->children()
-                ->append($this->getSenderNode())
+                ->append($this->getSenderNode()->isRequired())
                 ->append($this->getContextNode())
                 ->append($this->getHeadersNode())
                 ->append($this->getTransportsNode())
-                ->scalarNode('default_transport')->end()
-                ->append($this->getTransportsNode())
+                ->scalarNode('default_transport')->isRequired()->cannotBeEmpty()->end()
                 ->append($this->getEmailsNode())
             ->end();
 
         return $treeBuilder;
     }
 
-    private function getSenderNode()
+    private function getSenderNode($required = false)
     {
         $builder = new TreeBuilder();
         $node = $builder->root('sender');
 
         $node
-            ->isRequired()
             ->beforeNormalization()
             ->ifString()
                 ->then(function($value) { return ['address' => $value]; })
@@ -66,7 +58,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->children()
                 ->scalarNode('address')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('name')->end()
+                ->scalarNode('name')->defaultNull()->end()
             ->end();
 
         return $node;
@@ -95,15 +87,17 @@ class Configuration implements ConfigurationInterface
         //TODO: add zend support
 
         $node
-            ->requiresAtLeastOneElement()
             ->fixXmlConfig('transport')
-            ->normalizeKeys(false)
+            ->isRequired()
+            ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
-            ->prototype('array')->end()
-            ->children()
-                ->enumNode('type')->values(['swiftmailer', 'service'])->end()
-                ->scalarNode('service')->cannotBeEmpty()->end()
-            ->end()
+            ->normalizeKeys(false)
+                ->prototype('array')
+                    ->children()
+                        ->enumNode('type')->values(['swiftmailer', 'service'])->end()
+                        ->scalarNode('service')->cannotBeEmpty()->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $node;
@@ -131,15 +125,24 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
         $node = $builder->root('emails');
 
+        //TODO: add validation: expects one of service/twig/twig_blocks
         $node
             ->fixXmlConfig('email')
             ->useAttributeAsKey('name')
+            ->normalizeKeys(false)
             ->prototype('array')
                 ->children()
-                    ->scalarNode('subject')->end()
-                    ->scalarNode('body')->end()
-                    ->scalarNode('body_html')->end()
-                    ->scalarNode('template')->end()
+                    ->scalarNode('service')->end()
+                    ->scalarNode('twig')->end()
+                    ->arrayNode('twig_blocks')
+//                        ->prototype('array')
+                            ->children()
+                                ->scalarNode('subject')->end()
+                                ->scalarNode('body')->end()
+                                ->scalarNode('body_html')->end()
+                                ->scalarNode('headers')->end()
+                        ->end()
+                    ->end()
                     ->arrayNode('required_context_keys')
                     ->fixXmlConfig('required_context_key')
                         ->defaultValue([])
@@ -148,8 +151,10 @@ class Configuration implements ConfigurationInterface
                     ->append($this->getSenderNode())
                     ->append($this->getContextNode())
                     ->append($this->getHeadersNode())
-                ->end()
+                    ->scalarNode('transport')->defaultNull()->end()
             ->end()
-        ;
+            ->end();
+
+        return $node;
     }
 }

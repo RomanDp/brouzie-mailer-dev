@@ -1,9 +1,8 @@
 <?php
 
-namespace Brouzie\Mailer;
+namespace Brouzie\Mailer\Transport;
 
 use Brouzie\Mailer\Model\Email;
-use Brouzie\Mailer\Transport\Transport;
 
 class SwiftMailerTransport implements Transport
 {

@@ -16,18 +16,22 @@ brouzie_mailer:
         X-Abc: abcd
     emails:
         user_registration:
-            subject: Hello {{ user.name }}!
-            body: Hello {{ user.name }}!
-            body_html: Hello <b>{{ user.name }}</b>!
-            headers:
-                X-Ololo: trololo
+            twig_blocks:
+                subject: Hello {{ greeting }}!
+                body: Hello {{ greeting }}!
+                body_html: Hello <b>{{ greeting }}</b>!
+                headers: |
+                    X-Ololo: trololo
+            required_context_keys: [greeting]
         user_friendship_request:
-            template: '@App/emails/user_friendship_request.html.twig'
+            twig: '@App/emails/user_friendship_request.html.twig'
             context:
                 ololo: '%trololo%'
+            headers:
+                X-Ololo: trololo
             required_context_keys: [user, friend]
         daily_newsletter:
-            template: '@App/emails/daily_newsletter.html.twig'
-            transport: swiftmailer_delayed_spool
+            service: app.emails.daily_newsletter_email
+            transport: delayed
             sender:
                 newsletter@site.com: Daily Newsletter Robot
