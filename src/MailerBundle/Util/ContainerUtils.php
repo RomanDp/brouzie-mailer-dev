@@ -17,15 +17,18 @@ class ContainerUtils
      */
     public static function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
-        $services = $container->findTaggedServiceIds($tagName);
-        $queue = new \SplPriorityQueue();
-        foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $queue->insert(new Reference($serviceId), $priority);
-            }
+        $services = array();
+
+        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
+            $priority = $attributes[0]['priority'] ?? 0;
+            $services[$priority][] = new Reference($serviceId);
         }
 
-        return iterator_to_array($queue, false);
+        if ($services) {
+            krsort($services);
+            $services = array_merge(...$services);
+        }
+
+        return $services;
     }
 }
