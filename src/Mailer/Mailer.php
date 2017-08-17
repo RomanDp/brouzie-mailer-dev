@@ -130,8 +130,9 @@ class Mailer
         try {
             $predefinedEmail = $this->predefinedEmails->get($name);
         } catch (NotFoundExceptionInterface $e) {
-            //FIXME: how to get all available services?
-            throw PredefinedEmailNotFoundException::create($name, array_keys($this->predefinedEmails));
+            $availableEmails = method_exists($e, 'getAlternatives') ? $e->getAlternatives() : [];
+
+            throw PredefinedEmailNotFoundException::create($name, $availableEmails, $e);
         }
 
         $context = array_replace($predefinedEmail->getDefaultContext(), $context, ['_email_name' => $name]);
@@ -153,8 +154,9 @@ class Mailer
         try {
             return $this->transports->get($transport);
         } catch (NotFoundExceptionInterface $e) {
-            //FIXME: how to get all available services?
-            throw TransportNotFoundException::create($transport, array_keys($this->transports));
+            $availableTransports = method_exists($e, 'getAlternatives') ? $e->getAlternatives() : [];
+
+            throw TransportNotFoundException::create($transport, $availableTransports, $e);
         }
     }
 }

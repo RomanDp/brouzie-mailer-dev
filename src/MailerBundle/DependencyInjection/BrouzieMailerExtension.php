@@ -23,11 +23,6 @@ class BrouzieMailerExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $mailer = $container->getDefinition('brouzie.mailer');
-
-//        dump('extension');
-//        dump($config);exit;
-
         $container->setParameter('brouzie.mailer.default_sender', [$config['sender']['address'], $config['sender']['name']]);
         $container->setParameter('brouzie.mailer.default_transport', $config['default_transport']);
         $container->setParameter('brouzie.mailer.default_context', $config['context']);
