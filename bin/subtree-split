@@ -4,7 +4,9 @@ set -e
 set -x
 
 CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-git pull -f
+git reset --hard HEAD
+git clean -f -d
+git pull
 
 function split()
 {
