@@ -15,12 +15,12 @@ class TwigEmail extends Email
     /**
      * @internal
      */
-    const BLOCK_BODY = 'body';
+    const BLOCK_CONTENT = 'content';
 
     /**
      * @internal
      */
-    const BLOCK_PLAIN_BODY = 'plain_body';
+    const BLOCK_PLAIN_TEXT_CONTENT = 'plain_text_content';
 
     /**
      * @internal

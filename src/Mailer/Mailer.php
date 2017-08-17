@@ -90,7 +90,7 @@ class Mailer
     public function sendEmail(Email $email, array $context = [], $transport = null)
     {
         //TODO: add events?
-        $context = array_replace($this->defaultContext, $context);
+        $context = array_replace($this->defaultContext, $context, ['_email' => $email]);
         $email->addHeaders($this->defaultHeaders);
         $this->renderer->render($email, $context);
 
@@ -123,7 +123,7 @@ class Mailer
                 }
             }
         } else {
-            throw new InvalidArgumentException('Expected string/array/array of Address.');
+            throw new InvalidArgumentException('Expected string/array/Address instance/array of Address instances.');
         }
 
         /** @var PredefinedEmail $predefinedEmail */
@@ -140,6 +140,7 @@ class Mailer
 
         $email = $predefinedEmail->getEmail();
         $email->addRecipients($targetRecipients);
+
         if (null !== $configurator) {
             $configurator($email, $context);
         }

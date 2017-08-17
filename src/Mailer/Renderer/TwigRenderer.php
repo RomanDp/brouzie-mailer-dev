@@ -19,18 +19,17 @@ class TwigRenderer implements Renderer
     {
         /** @var TwigEmail $email */
         $template = $this->twig->load($email->getTemplate());
-        $context['_email'] = $this;
 
         if ($template->hasBlock(TwigEmail::BLOCK_SUBJECT)) {
             $email->setSubject($template->renderBlock(TwigEmail::BLOCK_SUBJECT, $context));
         }
 
-        if ($template->hasBlock(TwigEmail::BLOCK_BODY)) {
-            $email->setContent($template->renderBlock(TwigEmail::BLOCK_BODY, $context));
+        if ($template->hasBlock(TwigEmail::BLOCK_CONTENT)) {
+            $email->setContent($template->renderBlock(TwigEmail::BLOCK_CONTENT, $context));
         }
 
-        if ($template->hasBlock(TwigEmail::BLOCK_PLAIN_BODY)) {
-            $email->setPlainTextContent($template->renderBlock(TwigEmail::BLOCK_PLAIN_BODY, $context));
+        if ($template->hasBlock(TwigEmail::BLOCK_PLAIN_TEXT_CONTENT)) {
+            $email->setPlainTextContent($template->renderBlock(TwigEmail::BLOCK_PLAIN_TEXT_CONTENT, $context));
         }
 
         if ($template->hasBlock(TwigEmail::BLOCK_HEADERS)) {

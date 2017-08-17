@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function getSenderNode($required = false)
+    private function getSenderNode()
     {
         $builder = new TreeBuilder();
         $node = $builder->root('sender');
@@ -125,7 +125,7 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
         $node = $builder->root('emails');
 
-        //TODO: add validation: expects one of service/twig/twig_blocks
+        //TODO: add validation: expects one of service/twig/twig_blocks keys
         $node
             ->fixXmlConfig('email')
             ->useAttributeAsKey('name')
