@@ -2,6 +2,7 @@
 
 namespace Brouzie\Mailer\Container;
 
+use Brouzie\Mailer\Exception\ServiceNotFoundException;
 use Psr\Container\ContainerInterface;
 
 class SimpleServiceLocator implements ContainerInterface
@@ -20,6 +21,10 @@ class SimpleServiceLocator implements ContainerInterface
 
     public function get($id)
     {
-        //FIXME: Implement get() method.
+        if (isset($this->services[$id])) {
+            return $this->services[$id];
+        }
+
+        throw new ServiceNotFoundException($id, null, array_keys($this->services));
     }
 }
