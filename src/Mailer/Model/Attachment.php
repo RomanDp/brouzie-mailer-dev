@@ -2,7 +2,7 @@
 
 namespace Brouzie\Mailer\Model;
 
-class Attachment
+class Attachment extends AbstractAttachment
 {
-    // ...
+
 }

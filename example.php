@@ -2,6 +2,8 @@
 
 use Brouzie\Mailer\Mailer;
 use Brouzie\Mailer\Model\Address;
+use Brouzie\Mailer\Model\Attachment;
+use Brouzie\Mailer\Model\EmbeddedFile;
 use Brouzie\Mailer\Model\Twig\TwigEmail;
 use Brouzie\Mailer\Renderer\TwigRenderer;
 use Brouzie\Mailer\SwiftMailerTransport;
@@ -20,5 +22,7 @@ $mailer = new Mailer(
 
 $email = TwigEmail::create('@App/emails/user_registration.html.twig', new Address('koc-dp@yandex.ru'));
 $email->setSender(new Address(''));
+$email->addEmbeddedFile(new EmbeddedFile(file_get_contents('file.gif'), 'file.gif', 'image/gif'));
+$email->addAttachment(new Attachment(file_get_contents('payment.pdf'), 'payment.pdf', 'ololo/pdf'));
 
 $mailer->sendEmail($email);

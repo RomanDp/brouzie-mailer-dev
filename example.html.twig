@@ -1,5 +1,11 @@
 {% block subject 'Test Email' %}
 
+{% block content %}
+    Hello!
+
+    <img src="{{ _email.embedFile('greeting.gif') }}" />
+{% endblock %}
+
 {% block headers %}
 List-Unsubscribe: {{ url('app_notifications_unsubscribe', {'_email_name': _email_name}) }}
 {% endblock %}

@@ -15,7 +15,7 @@ class ContainerUtils
      *
      * @return Reference[]
      */
-    public static function findAndSortTaggedServices($tagName, ContainerBuilder $container)
+    public static function findAndSortTaggedServices(string $tagName, ContainerBuilder $container): array
     {
         $services = array();
 

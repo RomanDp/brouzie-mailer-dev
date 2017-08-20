@@ -25,19 +25,43 @@ class SwiftMailerTransport implements Transport
             $message->addTo($recipient->getAddress(), $recipient->getName());
         }
 
-//        if ($replyTo) {
-//            $message->setReplyTo($replyTo);
-//        }
+        $content = $email->getContent();
 
-        if ($email->getContent()) {
+        if ($content) {
+            $replacements = [];
+            foreach ($email->getEmbeddedFiles() as $name => $embeddedFile) {
+                $swiftEmbeddedFile = new \Swift_EmbeddedFile(
+                    $embeddedFile->getContent(),
+                    $embeddedFile->getFilename(),
+                    $embeddedFile->getContentType()
+                );
+                $replacements[$email->embedFile($name)] = $message->embed($swiftEmbeddedFile);
+            }
+
+            if ($replacements) {
+                $content = strtr($content, $replacements);
+            }
+
             $message
-                ->setBody($email->getContent(), 'text/html')
+                ->setBody($content, 'text/html')
                 ->addPart($email->getPlainTextContent(), 'text/plain');
         } else {
             $message->setBody($email->getPlainTextContent());
         }
 
-        //FIXME: headers, attachments
+        foreach ($email->getAttachments() as $attachment) {
+            $swiftAttachment = new \Swift_Attachment(
+                $attachment->getContent(),
+                $attachment->getFilename(),
+                $attachment->getContentType()
+            );
+            $message->attach($swiftAttachment);
+        }
+
+        //FIXME: headers
+//        if ($replyTo) {
+//            $message->setReplyTo($replyTo);
+//        }
 
         //TODO: handle failed recipients
         $this->mailer->send($message);

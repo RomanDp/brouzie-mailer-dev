@@ -2,9 +2,13 @@
 
 namespace Brouzie\Mailer\Model;
 
+use Brouzie\Mailer\Exception\InvalidArgumentException;
+
 class Email
 {
     //FIXME: isRendered, sendStatus?
+
+    const EMBED_PLACEHOLDER = '<!--brouzie_mailer_embed[%s]-->';
 
     private $subject;
 
@@ -23,6 +27,11 @@ class Email
      * @var Attachment[]
      */
     private $attachments = [];
+
+    /**
+     * @var EmbeddedFile[]
+     */
+    private $embeddedFiles = [];
 
     private $headers = [];
 
@@ -66,6 +75,7 @@ class Email
         return $this->sender;
     }
 
+    //TODO: add support of the cc, bcc
     public function addRecipient(Address $recipient)
     {
         $this->recipients[] = $recipient;
@@ -100,6 +110,28 @@ class Email
     public function addAttachment(Attachment $attachment)
     {
         $this->attachments[] = $attachment;
+    }
+
+    public function addEmbeddedFile(EmbeddedFile $embeddedFile, string $name = null)
+    {
+        $this->embeddedFiles[$name ?: $embeddedFile->getFilename()] = $embeddedFile;
+    }
+
+    /**
+     * @return EmbeddedFile[]
+     */
+    public function getEmbeddedFiles(): array
+    {
+        return $this->embeddedFiles;
+    }
+
+    public function embedFile(string $name): string
+    {
+        if (!isset($this->embeddedFiles[$name])) {
+            throw new InvalidArgumentException(sprintf('File "%s" not embedded.', $name));
+        }
+
+        return sprintf(self::EMBED_PLACEHOLDER, $name);
     }
 
     public function getHeaders(): array

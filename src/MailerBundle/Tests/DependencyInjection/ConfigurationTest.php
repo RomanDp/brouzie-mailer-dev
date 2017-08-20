@@ -30,7 +30,7 @@ class ConfigurationTest extends TestCase
     public function testSenderNodeRequired(array $userConfig)
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), [$userConfig]);
+        $processor->processConfiguration(new Configuration(), [$userConfig]);
     }
 
     public function senderDataProvider()
