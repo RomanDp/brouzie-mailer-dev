@@ -22,7 +22,7 @@ $mailer = new Mailer(
 
 $email = TwigEmail::create('@App/emails/user_registration.html.twig', new Address('koc-dp@yandex.ru'));
 $email->setSender(new Address(''));
-$email->addEmbeddedFile(new EmbeddedFile(file_get_contents('file.gif'), 'file.gif', 'image/gif'));
-$email->addAttachment(new Attachment(file_get_contents('payment.pdf'), 'payment.pdf', 'ololo/pdf'));
+$email->addEmbeddedFile(EmbeddedFile::fromPath('file.gif'));
+$email->addAttachment(Attachment::fromPath('payment.pdf'));
 
 $mailer->sendEmail($email);
