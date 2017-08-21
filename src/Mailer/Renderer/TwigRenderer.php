@@ -5,6 +5,7 @@ namespace Brouzie\Mailer\Renderer;
 use Brouzie\Mailer\Exception\IncompleteEmailException;
 use Brouzie\Mailer\Model\Email;
 use Brouzie\Mailer\Model\Twig\TwigEmail;
+use Brouzie\MailerBundle\Util\HeadersUtils;
 use Twig\Environment;
 
 class TwigRenderer implements Renderer
@@ -39,7 +40,7 @@ class TwigRenderer implements Renderer
 
         if ($template->hasBlock(TwigEmail::BLOCK_HEADERS)) {
             $headers = $template->renderBlock(TwigEmail::BLOCK_HEADERS, $context);
-            $headers = http_parse_headers($headers);
+            $headers = HeadersUtils::parseHeadersFromString($headers);
             $email->replaceHeaders($headers);
         }
     }

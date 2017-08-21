@@ -6,6 +6,7 @@ use Brouzie\Mailer\Exception\IncompleteEmailException;
 use Brouzie\Mailer\Model\Email;
 use Brouzie\Mailer\Model\Twig\TwigContentEmail;
 use Brouzie\Mailer\Model\Twig\TwigEmail;
+use Brouzie\MailerBundle\Util\HeadersUtils;
 use Twig\Environment;
 
 class TwigContentRenderer implements Renderer
@@ -36,10 +37,9 @@ class TwigContentRenderer implements Renderer
             throw new IncompleteEmailException('Email requires content or plain text content.');
         }
 
-        //FIXME: provide polyfil for http_parse_headers function
         if ($template = $email->getTemplateContent(TwigEmail::BLOCK_HEADERS)) {
             $headers = $this->twig->createTemplate($template)->render($context);
-            $headers = http_parse_headers($headers);
+            $headers = HeadersUtils::parseHeadersFromString($headers);
             $email->replaceHeaders($headers);
         }
     }

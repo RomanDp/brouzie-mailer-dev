@@ -24,11 +24,12 @@ class SimpleServiceLocatorTest extends TestCase
         $this->assertSame($serviceA, $serviceLocator->get('service_a'));
     }
 
+    /**
+     * @expectedException \Brouzie\Mailer\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent service "service_c". Did you mean one of these: "service_a", "service_b"?
+     */
     public function testGetNotFoundService()
     {
-        $this->expectException(ServiceNotFoundException::class);
-        $this->expectExceptionMessage('You have requested a non-existent service "service_c". Did you mean one of these: "service_a", "service_b"?');
-
         $serviceA = new \stdClass();
         $serviceLocator = new SimpleServiceLocator(['service_a' => $serviceA, 'service_b' => new \stdClass()]);
 

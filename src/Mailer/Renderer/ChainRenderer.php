@@ -27,7 +27,7 @@ class ChainRenderer implements Renderer
             }
         }
 
-        throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', gettype($email)));
+        throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', get_class($email)));
     }
 
     public function supports(Email $email): bool

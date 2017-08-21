@@ -23,32 +23,14 @@ class TwigContentRendererTest extends TestCase
 
     public function testRender()
     {
-        $twig = $this->createMock(Environment::class);
-
-        $twig
-            ->expects($this->any())
-            ->method('createTemplate')
-            ->willReturnCallback(function($templateContent) {
-                $template = $this->createMock(Template::class);
-
-                $template
-                    ->expects($this->any())
-                    ->method('render')
-                    ->willReturnCallback(function($context) use ($templateContent) {
-                        return strtr($templateContent, $context);
-                    });
-
-                return $template;
-            });
-
-        $renderer = new TwigContentRenderer($twig);
+        $renderer = new TwigContentRenderer($this->getTwigMock());
 
         $email = new TwigContentEmail(
             [
                 TwigEmail::BLOCK_SUBJECT => 'subject %foo%',
                 TwigEmail::BLOCK_CONTENT => 'content <b>%foo%</b>',
                 TwigEmail::BLOCK_PLAIN_TEXT_CONTENT => 'plain text content %foo%',
-//                TwigEmail::BLOCK_HEADERS => 'X-Header-Name: %foo%',
+                TwigEmail::BLOCK_HEADERS => 'X-Header-Name: %foo%',
             ]
         );
 
@@ -62,6 +44,49 @@ class TwigContentRendererTest extends TestCase
         $this->assertSame('subject foo_value', $email->getSubject());
         $this->assertSame('content <b>foo_value</b>', $email->getContent());
         $this->assertSame('plain text content foo_value', $email->getPlainTextContent());
-//        $this->assertSame(['X-Header-Name' => 'foo_value'], $email->getHeaders());
+        $this->assertSame(['X-Header-Name' => 'foo_value'], $email->getHeaders());
+    }
+
+    /**
+     * @expectedException \Brouzie\Mailer\Exception\IncompleteEmailException
+     */
+    public function testRenderIncompleteEmail()
+    {
+        $renderer = new TwigContentRenderer($this->getTwigMock());
+
+        $email = new TwigContentEmail(
+            [
+                TwigEmail::BLOCK_SUBJECT => 'subject %foo%',
+            ]
+        );
+
+        $renderer->render($email, ['%foo%' => 'foo_value']);
+    }
+
+    protected function getTwigMock()
+    {
+        $twig = $this->createMock(Environment::class);
+
+        $twig
+            ->expects($this->any())
+            ->method('createTemplate')
+            ->willReturnCallback(
+                function ($templateContent) {
+                    $template = $this->createMock(Template::class);
+
+                    $template
+                        ->expects($this->any())
+                        ->method('render')
+                        ->willReturnCallback(
+                            function ($context) use ($templateContent) {
+                                return strtr($templateContent, $context);
+                            }
+                        );
+
+                    return $template;
+                }
+            );
+
+        return $twig;
     }
 }

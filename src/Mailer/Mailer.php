@@ -96,7 +96,7 @@ class Mailer
 
         //TODO: add support of already rendered emails?
         if (!$this->renderer->supports($email)) {
-            throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', gettype($email)));
+            throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', get_class($email)));
         }
 
         $this->renderer->render($email, $context);
