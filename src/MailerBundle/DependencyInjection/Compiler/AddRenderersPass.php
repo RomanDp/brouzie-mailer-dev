@@ -4,6 +4,7 @@ namespace Brouzie\MailerBundle\DependencyInjection\Compiler;
 
 use Brouzie\MailerBundle\Util\ContainerUtils;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,8 +23,13 @@ class AddRenderersPass implements CompilerPassInterface
             $container->setAlias('brouzie_mailer.renderer', new Alias((string)reset($renderers), false));
         } else {
             $definition = $container->getDefinition('brouzie_mailer.renderers.chain');
-            //TODO: add support of service closure
-            $definition->replaceArgument(0, $renderers);
+
+            if (class_exists(IteratorArgument::class)) {
+                $definition->replaceArgument(0, new IteratorArgument($renderers));
+            } else {
+                $definition->replaceArgument(0, $renderers);
+            }
+
             $container->setAlias('brouzie_mailer.renderer', new Alias('brouzie_mailer.renderers.chain', false));
         }
     }

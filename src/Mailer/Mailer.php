@@ -110,29 +110,12 @@ class Mailer
 
     /**
      * @param $name
-     * @param string|array|Address|Address[] $recipients
+     * @param string|iterable|Address|Address[] $recipients
      * @param array $context
      * @param callable|null $configurator
      */
     public function sendNamedEmail(string $name, $recipients, array $context = [], callable $configurator = null)
     {
-        $targetRecipients = [];
-        if (is_string($recipients)) {
-            $targetRecipients[] = new Address($recipients);
-        } elseif ($recipients instanceof Address) {
-            $targetRecipients[] = $recipients;
-        } elseif (is_iterable($recipients)) {
-            foreach ($recipients as $key => $recipient) {
-                if (is_int($key)) {
-                    $targetRecipients[] = new Address($recipient);
-                } else {
-                    $targetRecipients[] = new Address($key, $recipient);
-                }
-            }
-        } else {
-            throw new InvalidArgumentException('Expected string/array/Address instance/array of Address instances.');
-        }
-
         /** @var PredefinedEmail $predefinedEmail */
         try {
             $predefinedEmail = $this->predefinedEmails->get($name);
@@ -146,13 +129,42 @@ class Mailer
         $predefinedEmail->validateContext($context);
 
         $email = $predefinedEmail->getEmail();
-        $email->addRecipients($targetRecipients);
+        $email->addRecipients(self::normalizeRecipients($recipients));
 
         if (null !== $configurator) {
             $configurator($email, $context);
         }
 
         $this->sendEmail($email, $context, $predefinedEmail->getTransport());
+    }
+
+    /**
+     * @param string|iterable|Address|Address[] $recipients
+     *
+     * @return Address[]
+     */
+    public static function normalizeRecipients($recipients): array
+    {
+        $targetRecipients = [];
+        if (is_string($recipients)) {
+            $targetRecipients[] = new Address($recipients);
+        } elseif ($recipients instanceof Address) {
+            $targetRecipients[] = $recipients;
+        } elseif (is_iterable($recipients)) {
+            foreach ($recipients as $key => $recipient) {
+                if ($recipient instanceof Address) {
+                    $targetRecipients[] = $recipient;
+                } elseif (is_int($key)) {
+                    $targetRecipients[] = new Address($recipient);
+                } else {
+                    $targetRecipients[] = new Address($key, $recipient);
+                }
+            }
+        } else {
+            throw new InvalidArgumentException('Expected string/array/Address instance/array of Address instances.');
+        }
+
+        return $targetRecipients;
     }
 
     private function getTransport($transport): Transport

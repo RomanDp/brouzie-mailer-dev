@@ -87,6 +87,7 @@ class BrouzieMailerExtension extends Extension
             } elseif (!empty($emailConfig['service'])) {
                 $emailId = $emailConfig['service'];
                 //FIXME: add logic
+                throw new InvalidArgumentException('Not yet supported.');
                 continue;
             } else {
                 continue;

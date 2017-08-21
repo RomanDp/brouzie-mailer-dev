@@ -14,12 +14,12 @@ class ConfigurationTest extends TestCase
     public function testSenderNodeNormalization(array $userConfig, array $normalizedConfig)
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), [$userConfig]);
-
-        $this->assertEquals(
-            array_merge($normalizedConfig, ['headers' => [], 'emails' => [], 'context' => []]),
-            $config
+        $config = $processor->processConfiguration(
+            new Configuration(),
+            [$this->getDefaultConfiguration(), $userConfig]
         );
+
+        $this->assertArraySubset($normalizedConfig, $config);
     }
 
     /**
@@ -33,12 +33,34 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration(new Configuration(), [$userConfig]);
     }
 
+    /**
+     * @dataProvider transportsProvider
+     */
+    public function testFirstTransportSetsAsDefault(array $userConfig, string $defaultTransport)
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(), [$userConfig]);
+
+        $this->assertSame($defaultTransport, $config['default_transport']);
+    }
+
+    /**
+     * @dataProvider invalidEmailTypesProvider
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp  /Please define one and only one of twig\/twig_blocks\/service keys\./
+     */
+    public function testEmailsTypesRequired(array $userConfig)
+    {
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(), [$this->getDefaultConfiguration(), $userConfig]);
+    }
+
     public function senderDataProvider()
     {
         return [
             [
                 ['sender' => 'info@site.com'],
-                ['sender' => ['address' => 'info@site.com']],
+                ['sender' => ['address' => 'info@site.com', 'name' => null]],
             ],
             [
                 ['sender' => ['info@site.com' => 'Site Notifications System']],
@@ -63,6 +85,62 @@ class ConfigurationTest extends TestCase
             [
                 ['sender' => ['address' => null]],
             ],
+        ];
+    }
+
+    public function transportsProvider()
+    {
+        return [
+            [
+                [
+                    'sender' => 'info@site.com',
+                    'transports' => [
+                        'default' => ['type' => 'swiftmailer', 'service' => 'swiftmailer.default'],
+                        'delayed' => ['type' => 'swiftmailer', 'service' => 'swiftmailer.delayed'],
+                    ],
+                ],
+                'default',
+            ],
+            [
+                [
+                    'sender' => 'info@site.com',
+                    'default_transport' => 'delayed',
+                    'transports' => [
+                        'default' => ['type' => 'swiftmailer', 'service' => 'swiftmailer.default'],
+                        'delayed' => ['type' => 'swiftmailer', 'service' => 'swiftmailer.delayed'],
+                    ],
+                ],
+                'delayed',
+            ],
+        ];
+    }
+
+    public function invalidEmailTypesProvider()
+    {
+        return [
+            [
+                [
+                    'emails' => [
+                        'one' => [],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'emails' => [
+                        'one' => [],
+                        'two' => ['twig' => '@AppBundle/path/to/template.html.twig', 'service' => 'service.id'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function getDefaultConfiguration()
+    {
+        return [
+            'sender' => 'info@site.com',
+            'transports' => ['default' => ['type' => 'swiftmailer', 'service' => 'swiftmailer.default']],
         ];
     }
 }

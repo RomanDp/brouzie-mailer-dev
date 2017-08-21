@@ -113,7 +113,7 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('context', 'context')
             ->normalizeKeys(false)
             ->useAttributeAsKey('key')
-            ->example(array('foo' => '"@bar"', 'pi' => 3.14))
+            //->example(array('foo' => '"@bar"', 'pi' => 3.14))
             ->prototype('scalar')->end()
             ->end();
 
@@ -125,22 +125,28 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
         $node = $builder->root('emails');
 
-        //TODO: add validation: expects one of service/twig/twig_blocks keys
         $node
             ->fixXmlConfig('email')
             ->useAttributeAsKey('name')
             ->normalizeKeys(false)
             ->prototype('array')
+                ->validate()
+                    ->ifTrue(function ($email) {
+                        $res = array_intersect_key(['twig' => true, 'twig_blocks' => true, 'service' => true], $email);
+
+                        return count($res) !== 1;
+                    })
+                    ->thenInvalid('Please define one and only one of twig/twig_blocks/service keys.')
+                ->end()
                 ->children()
                     ->scalarNode('service')->end()
                     ->scalarNode('twig')->end()
                     ->arrayNode('twig_blocks')
-//                        ->prototype('array')
-                            ->children()
-                                ->scalarNode('subject')->end()
-                                ->scalarNode('content')->end()
-                                ->scalarNode('plain_text_content')->end()
-                                ->scalarNode('headers')->end()
+                        ->children()
+                            ->scalarNode('subject')->end()
+                            ->scalarNode('content')->end()
+                            ->scalarNode('plain_text_content')->end()
+                            ->scalarNode('headers')->end()
                         ->end()
                     ->end()
                     ->arrayNode('required_context_keys')
