@@ -18,8 +18,8 @@ brouzie_mailer:
         user_registration:
             twig_blocks:
                 subject: Hello {{ greeting }}!
-                body: Hello {{ greeting }}!
-                body_html: Hello <b>{{ greeting }}</b>!
+                content: Hello {{ greeting }}!
+                plain_text_content: Hello <b>{{ greeting }}</b>!
                 headers: |
                     X-Ololo: trololo
             required_context_keys: [greeting]
