@@ -11,7 +11,7 @@ class AddRenderersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('brouzie.mailer.renderers.chain')) {
+        if (!$container->hasDefinition('brouzie_mailer.renderers.chain')) {
             return;
         }
 
@@ -19,12 +19,12 @@ class AddRenderersPass implements CompilerPassInterface
 
         if (1 === count($renderers)) {
             // Use an alias instead of wrapping it in the ChainRenderer for performances when using only one
-            $container->setAlias('brouzie.mailer.renderer', new Alias((string)reset($renderers), false));
+            $container->setAlias('brouzie_mailer.renderer', new Alias((string)reset($renderers), false));
         } else {
-            $definition = $container->getDefinition('brouzie.mailer.renderers.chain');
+            $definition = $container->getDefinition('brouzie_mailer.renderers.chain');
             //TODO: add support of service closure
             $definition->replaceArgument(0, $renderers);
-            $container->setAlias('brouzie.mailer.renderer', new Alias('brouzie.mailer.renderers.chain', false));
+            $container->setAlias('brouzie_mailer.renderer', new Alias('brouzie_mailer.renderers.chain', false));
         }
     }
 }

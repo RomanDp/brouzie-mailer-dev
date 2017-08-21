@@ -23,10 +23,10 @@ class BrouzieMailerExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('brouzie.mailer.default_sender', [$config['sender']['address'], $config['sender']['name']]);
-        $container->setParameter('brouzie.mailer.default_transport', $config['default_transport']);
-        $container->setParameter('brouzie.mailer.default_context', $config['context']);
-        $container->setParameter('brouzie.mailer.default_headers', $config['headers']);
+        $container->setParameter('brouzie_mailer.default_sender', [$config['sender']['address'], $config['sender']['name']]);
+        $container->setParameter('brouzie_mailer.default_transport', $config['default_transport']);
+        $container->setParameter('brouzie_mailer.default_context', $config['context']);
+        $container->setParameter('brouzie_mailer.default_headers', $config['headers']);
 
         $this->configureTransports($config['transports'], $container);
         $this->configureEmails($config['emails'], $container);
@@ -38,8 +38,8 @@ class BrouzieMailerExtension extends Extension
         foreach ($transports as $name => $transportConfig) {
             switch ($transportConfig['type']) {
                 case 'swiftmailer':
-                    $definitionDecorator = $this->createChildDefinition('brouzie.mailer.transport.swiftmailer.abstract');
-                    $id = sprintf('brouzie.mailer.transport.swiftmailer.%s', $name);
+                    $definitionDecorator = $this->createChildDefinition('brouzie_mailer.transport.swiftmailer.abstract');
+                    $id = sprintf('brouzie_mailer.transport.swiftmailer.%s', $name);
                     $container
                         ->setDefinition($id, $definitionDecorator)
                         ->replaceArgument(0, new Reference($transportConfig['service']));
@@ -59,7 +59,7 @@ class BrouzieMailerExtension extends Extension
         }
 
         // http://symfony.com/doc/current/service_container/service_locators.html
-        $transportLocator = $container->getDefinition('brouzie.mailer.transport_locator');
+        $transportLocator = $container->getDefinition('brouzie_mailer.transport_locator');
         $transportLocator->replaceArgument(0, $transportReferences);
         if (class_exists(ServiceLocator::class)) {
             $transportLocator->setClass(ServiceLocator::class);
@@ -73,14 +73,14 @@ class BrouzieMailerExtension extends Extension
         $emailReferences = [];
         foreach ($emails as $name => $emailConfig) {
             if (!empty($emailConfig['twig'])) {
-                $definitionDecorator = $this->createChildDefinition('brouzie.mailer.emails.twig_email.abstract');
-                $emailId = sprintf('brouzie.mailer.emails.twig_email.%s', $name);
+                $definitionDecorator = $this->createChildDefinition('brouzie_mailer.emails.twig_email.abstract');
+                $emailId = sprintf('brouzie_mailer.emails.twig_email.%s', $name);
                 $container
                     ->setDefinition($emailId, $definitionDecorator)
                     ->replaceArgument(0, $emailConfig['twig']);
             } elseif (!empty($emailConfig['twig_blocks'])) {
-                $definitionDecorator = $this->createChildDefinition('brouzie.mailer.emails.twig_content_email.abstract');
-                $emailId = sprintf('brouzie.mailer.emails.twig_content_email.%s', $name);
+                $definitionDecorator = $this->createChildDefinition('brouzie_mailer.emails.twig_content_email.abstract');
+                $emailId = sprintf('brouzie_mailer.emails.twig_content_email.%s', $name);
                 $container
                     ->setDefinition($emailId, $definitionDecorator)
                     ->replaceArgument(0, $emailConfig['twig_blocks']);
@@ -92,8 +92,8 @@ class BrouzieMailerExtension extends Extension
                 continue;
             }
 
-            $definitionDecorator = $this->createChildDefinition('brouzie.mailer.emails.predefined_email.abstract');
-            $id = sprintf('brouzie.mailer.emails.email.%s', $name);
+            $definitionDecorator = $this->createChildDefinition('brouzie_mailer.emails.predefined_email.abstract');
+            $id = sprintf('brouzie_mailer.emails.email.%s', $name);
             $container
                 ->setDefinition($id, $definitionDecorator)
                 ->replaceArgument(0, new Reference($emailId))
@@ -104,7 +104,7 @@ class BrouzieMailerExtension extends Extension
             $emailReferences[$name] = new Reference($id);
         }
 
-        $transportLocator = $container->getDefinition('brouzie.mailer.predefined_email_locator');
+        $transportLocator = $container->getDefinition('brouzie_mailer.predefined_email_locator');
         $transportLocator->replaceArgument(0, $emailReferences);
         if (class_exists(ServiceLocator::class)) {
             $transportLocator->setClass(ServiceLocator::class);
