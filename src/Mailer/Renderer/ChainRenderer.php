@@ -19,7 +19,6 @@ class ChainRenderer implements Renderer
 
     public function render(Email $email, array $context = []): void
     {
-        //TODO: who calls supports - this class or other?
         foreach ($this->renderers as $renderer) {
             if ($renderer->supports($email)) {
                 $renderer->render($email, $context);
@@ -28,7 +27,7 @@ class ChainRenderer implements Renderer
             }
         }
 
-        throw new RendererNotFoundException('No renderer found for email.');
+        throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', gettype($email)));
     }
 
     public function supports(Email $email): bool

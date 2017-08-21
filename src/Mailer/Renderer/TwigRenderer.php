@@ -2,6 +2,7 @@
 
 namespace Brouzie\Mailer\Renderer;
 
+use Brouzie\Mailer\Exception\IncompleteEmailException;
 use Brouzie\Mailer\Model\Email;
 use Brouzie\Mailer\Model\Twig\TwigEmail;
 use Twig\Environment;
@@ -30,6 +31,10 @@ class TwigRenderer implements Renderer
 
         if ($template->hasBlock(TwigEmail::BLOCK_PLAIN_TEXT_CONTENT)) {
             $email->setPlainTextContent($template->renderBlock(TwigEmail::BLOCK_PLAIN_TEXT_CONTENT, $context));
+        }
+
+        if (!$email->getContent() && !$email->getPlainTextContent()) {
+            throw new IncompleteEmailException('Email requires content or plain text content.');
         }
 
         if ($template->hasBlock(TwigEmail::BLOCK_HEADERS)) {

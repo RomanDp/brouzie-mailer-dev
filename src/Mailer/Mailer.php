@@ -5,6 +5,7 @@ namespace Brouzie\Mailer;
 use Brouzie\Mailer\Container\SimpleServiceLocator;
 use Brouzie\Mailer\Exception\InvalidArgumentException;
 use Brouzie\Mailer\Exception\PredefinedEmailNotFoundException;
+use Brouzie\Mailer\Exception\RendererNotFoundException;
 use Brouzie\Mailer\Exception\TransportNotFoundException;
 use Brouzie\Mailer\Model\Address;
 use Brouzie\Mailer\Model\Email;
@@ -92,6 +93,12 @@ class Mailer
         //TODO: add events?
         $context = array_replace($this->defaultContext, $context, ['_email' => $email]);
         $email->addHeaders($this->defaultHeaders);
+
+        //TODO: add support of already rendered emails?
+        if (!$this->renderer->supports($email)) {
+            throw new RendererNotFoundException(sprintf('No renderer found for email of type "%s".', gettype($email)));
+        }
+
         $this->renderer->render($email, $context);
 
         if (null === $email->getSender()) {
