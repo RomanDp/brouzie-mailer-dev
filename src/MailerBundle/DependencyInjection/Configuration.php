@@ -30,6 +30,10 @@ class Configuration implements ConfigurationInterface
                 ->append($this->getHeadersNode())
                 ->append($this->getTransportsNode())
                 ->scalarNode('default_transport')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('embedded_files_path')
+                    ->defaultValue('%kernel.root_dir%/../web/emails')
+                    ->cannotBeEmpty()
+                ->end()
                 ->append($this->getEmailsNode())
             ->end();
 

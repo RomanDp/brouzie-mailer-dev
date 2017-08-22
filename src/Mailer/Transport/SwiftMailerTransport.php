@@ -58,7 +58,11 @@ class SwiftMailerTransport implements Transport
             $message->attach($swiftAttachment);
         }
 
-        //FIXME: headers
+        //TODO: separate headers by type?
+        foreach ($email->getHeaders() as $headerName => $headerValue) {
+            $message->getHeaders()->addTextHeader($headerName, $headerValue);
+        }
+
 //        if ($replyTo) {
 //            $message->setReplyTo($replyTo);
 //        }

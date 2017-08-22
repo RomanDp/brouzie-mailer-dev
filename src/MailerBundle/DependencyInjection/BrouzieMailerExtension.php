@@ -27,6 +27,7 @@ class BrouzieMailerExtension extends Extension
         $container->setParameter('brouzie_mailer.default_transport', $config['default_transport']);
         $container->setParameter('brouzie_mailer.default_context', $config['context']);
         $container->setParameter('brouzie_mailer.default_headers', $config['headers']);
+        $container->setParameter('brouzie_mailer.embedded_files_path', $config['embedded_files_path']);
 
         $this->configureTransports($config['transports'], $container);
         $this->configureEmails($config['emails'], $container);

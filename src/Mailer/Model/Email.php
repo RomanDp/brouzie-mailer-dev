@@ -114,6 +114,7 @@ class Email
 
     public function addEmbeddedFile(EmbeddedFile $embeddedFile, string $name = null)
     {
+        //TODO: properly handle already exists
         $this->embeddedFiles[$name ?: $embeddedFile->getFilename()] = $embeddedFile;
     }
 

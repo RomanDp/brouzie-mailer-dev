@@ -35,7 +35,13 @@ class TwigRenderer implements Renderer
         }
 
         if (!$email->getContent() && !$email->getPlainTextContent()) {
-            throw new IncompleteEmailException('Email requires content or plain text content.');
+            throw new IncompleteEmailException(
+                sprintf(
+                    'Email requires content or plain text content. Check that your template contains "%s" or "%s" blocks.',
+                    TwigEmail::BLOCK_CONTENT,
+                    TwigEmail::BLOCK_PLAIN_TEXT_CONTENT
+                )
+            );
         }
 
         if ($template->hasBlock(TwigEmail::BLOCK_HEADERS)) {

@@ -3,9 +3,11 @@
 {% block content %}
     Hello!
 
-    <img src="{{ _email.embedFile('greeting.gif') }}" />
+    <img src="{{ brouzie_mailer_embed_file('file.jpeg') }}" />
 {% endblock %}
 
 {% block headers %}
-List-Unsubscribe: {{ url('app_notifications_unsubscribe', {'_email_name': _email_name}) }}
+{% autoescape false %}
+List-Unsubscribe: {{ url('app_notifications_unsubscribe', {'_email_name': _email_name, 'email': (_email.recipients|first).address}) }}
+{% endautoescape %}
 {% endblock %}
