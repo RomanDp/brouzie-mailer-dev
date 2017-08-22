@@ -5,7 +5,7 @@ namespace Brouzie\Mailer\Renderer;
 use Brouzie\Mailer\Exception\IncompleteEmailException;
 use Brouzie\Mailer\Model\Email;
 use Brouzie\Mailer\Model\Twig\TwigEmail;
-use Brouzie\MailerBundle\Util\HeadersUtils;
+use Brouzie\Mailer\Util\HeadersUtils;
 use Twig\Environment;
 
 class TwigRenderer implements Renderer

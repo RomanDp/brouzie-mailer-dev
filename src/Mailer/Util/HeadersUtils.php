@@ -1,6 +1,6 @@
 <?php
 
-namespace Brouzie\MailerBundle\Util;
+namespace Brouzie\Mailer\Util;
 
 class HeadersUtils
 {
