@@ -21,7 +21,8 @@
         </service>
 
         <service id="brouzie_mailer.default_sender" class="Brouzie\Mailer\Model\Address" public="false">
-            <argument>%brouzie_mailer.default_sender%</argument>
+            <argument>%brouzie_mailer.default_sender.address%</argument>
+            <argument>%brouzie_mailer.default_sender.name%</argument>
         </service>
 
         <service id="brouzie_mailer.predefined_email_locator" class="Brouzie\Mailer\Container\SimpleServiceLocator" public="false">

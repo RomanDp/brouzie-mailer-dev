@@ -23,7 +23,8 @@ class BrouzieMailerExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('brouzie_mailer.default_sender', [$config['sender']['address'], $config['sender']['name']]);
+        $container->setParameter('brouzie_mailer.default_sender.address', $config['sender']['address']);
+        $container->setParameter('brouzie_mailer.default_sender.name', $config['sender']['name']);
         $container->setParameter('brouzie_mailer.default_transport', $config['default_transport']);
         $container->setParameter('brouzie_mailer.default_context', $config['context']);
         $container->setParameter('brouzie_mailer.default_headers', $config['headers']);
@@ -98,6 +99,7 @@ class BrouzieMailerExtension extends Extension
             $id = sprintf('brouzie_mailer.emails.email.%s', $name);
             $container
                 ->setDefinition($id, $definitionDecorator)
+                ->setShared(false)
                 ->replaceArgument(0, new Reference($emailId))
                 ->replaceArgument(1, $emailConfig['context'])
                 ->replaceArgument(2, $emailConfig['required_context_keys'])

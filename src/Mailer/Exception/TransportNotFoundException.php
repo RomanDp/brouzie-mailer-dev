@@ -9,7 +9,7 @@ class TransportNotFoundException extends InvalidArgumentException
         $msg = sprintf('Transport "%s" not exists.', $requestedTransport);
 
         if (count($availableTransports)) {
-            $msg .= sprintf(' Available transports: "%s".', implode('", "', array_keys($availableTransports)));
+            $msg .= sprintf(' Available transports: "%s".', implode('", "', $availableTransports));
         }
 
         return new self($msg, null, $previous);
