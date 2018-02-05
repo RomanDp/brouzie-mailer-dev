@@ -1,0 +1,18 @@
+version: '3'
+services:
+    brouzie_mailer_web:
+        image: brouzie/php:7.1
+        container_name: brouzie_mailer_web
+        hostname: brouzie_mailer_web
+        volumes:
+            - composer-cache-volume:/home/dev/.composer/cache
+            - ./..:/var/www/html
+        environment:
+            PASSWORD: 112233
+            EXPOSE_HOSTS: |-
+                brouzie_mailer.test
+
+volumes:
+    composer-cache-volume:
+        external: true
+
